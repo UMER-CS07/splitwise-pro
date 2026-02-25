@@ -2,7 +2,7 @@ from Models.connection import get_connection
 def add_expense(group_id, paid_by_user_id, amount, description):
     conn = get_connection()
     cursor = conn.cursor()
-    sql = "INSERT INTO Expenses (Group_ID, Pair_ID, Amount, Expense_Date, Description) VALUES (%s, %s, %s, NOW(), %s)"
+    sql = "INSERT INTO expenses (Group_ID, Pair_ID, Amount, Expense_Date, Description) VALUES (%s, %s, %s, NOW(), %s)"
     cursor.execute(sql, (group_id, paid_by_user_id, amount, description))
     expense_id = cursor.lastrowid
     conn.commit()
