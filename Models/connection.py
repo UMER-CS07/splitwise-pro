@@ -11,7 +11,9 @@ def get_connection():
         user=os.environ.get("DB_USER"),
         password=os.environ.get("DB_PASSWORD"),
         database=os.environ.get("DB_NAME"),
-        port=int(os.environ.get("DB_PORT", 3306))
+        port=int(os.environ.get("DB_PORT", 3306)),
+        ssl_disabled=False,       # CRITICAL: Tells Aiven to use SSL
+        connection_timeout=10
     )
     return conn
 
