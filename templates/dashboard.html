@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard - Splitwise Pro</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-dark: #0b0b0b;
+      --card-bg: #161616;
+      --accent: #00ffaa;
+      --accent-glow: rgba(0, 255, 170, 0.3);
+      --text-main: #eeeeee;
+      --text-dim: #a0a0a0;
+      --sidebar-width: 260px;
+      --sidebar-collapsed: 80px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      overflow-x: hidden;
+      display: flex;
+    }
+
+    /* --- SIDEBAR --- */
+    .sidebar {
+      width: var(--sidebar-width);
+      height: 100vh;
+      background: var(--card-bg);
+      border-right: 1px solid #222;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1000;
+    }
+
+    .sidebar.collapsed { width: var(--sidebar-collapsed); }
+
+    .sidebar-header {
+      padding: 30px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      color: var(--accent);
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sidebar.collapsed .logo span { display: none; }
+
+    .toggle-btn {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .nav-links {
+      list-style: none;
+      padding: 0 15px;
+      flex-grow: 1;
+    }
+
+    .nav-links li { margin-bottom: 8px; }
+
+    .nav-links a {
+      display: flex;
+      align-items: center;
+      padding: 14px 15px;
+      color: var(--text-dim);
+      text-decoration: none;
+      border-radius: 10px;
+      transition: 0.3s;
+      gap: 15px;
+    }
+
+    .nav-links a i { font-size: 1.2rem; min-width: 25px; text-align: center; }
+
+    .nav-links a:hover, .nav-links li.active a {
+      background: rgba(0, 255, 170, 0.1);
+      color: var(--accent);
+    }
+
+    .sidebar.collapsed .nav-links span { display: none; }
+
+    /* --- MAIN CONTENT --- */
+    .main-content {
+      margin-left: var(--sidebar-width);
+      flex-grow: 1;
+      padding: 40px;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar.collapsed ~ .main-content { margin-left: var(--sidebar-collapsed); }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 40px;
+    }
+
+    .welcome-text h1 { font-size: 2rem; margin-bottom: 5px; }
+    .welcome-text h1 span { color: var(--accent); }
+    .welcome-text p { color: var(--text-dim); }
+
+    .wallet-pill {
+      background: rgba(0, 255, 170, 0.05);
+      border: 1px solid var(--accent);
+      padding: 12px 20px;
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    /* --- ANALYTICS GRID --- */
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      margin-bottom: 40px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      padding: 25px;
+      border-radius: 18px;
+      border: 1px solid #222;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      transition: 0.3s;
+    }
+
+    .stat-card:hover { transform: translateY(-5px); border-color: var(--accent); }
+
+    .icon-box {
+      width: 60px;
+      height: 60px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      background: #222;
+    }
+
+    .stat-info h3 { font-size: 0.9rem; color: var(--text-dim); margin-bottom: 5px; }
+    .stat-info p { font-size: 1.5rem; font-weight: bold; }
+
+    /* --- QUICK ACTIONS --- */
+    .section-title { margin-bottom: 20px; font-size: 1.2rem; }
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .action-card {
+      background: #1a1a1a;
+      padding: 30px;
+      border-radius: 15px;
+      text-decoration: none;
+      color: var(--text-main);
+      text-align: center;
+      border: 1px solid #333;
+      transition: 0.3s;
+    }
+
+    .action-card i { font-size: 2rem; color: var(--accent); margin-bottom: 15px; display: block; }
+
+    .action-card:hover {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .action-card:hover i { color: #000; }
+
+    .flash-container {
+      margin-bottom: 25px;
+    }
+
+    .flash-msg {
+      background: rgba(0, 255, 170, 0.1);
+      padding: 15px;
+      border-radius: 10px;
+      border-left: 4px solid var(--accent);
+      color: var(--accent);
+    }
+  </style>
+</head><body>
+
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <i class="fas fa-bolt"></i> <span>SPLITWISE</span>
+      </div>
+      <button class="toggle-btn" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+
+    <ul class="nav-links">
+      <li class="active"><a href="/dashboard"><i class="fas fa-home"></i> <span>Overview</span></a></li>
+      <li><a href="/groups"><i class="fas fa-users"></i> <span>My Groups</span></a></li>
+      <li><a href="/feedback"><i class="fas fa-comment-dots"></i> <span>Feedback</span></a></li>
+      <li style="margin-top: auto; padding-bottom: 20px;">
+        <a href="/logout" style="color: #ff4d4d;"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="main-content">
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-container">
+          {% for category, message in messages %}
+            <div class="flash-msg"><strong>{{ message }}</strong></div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <header>
+      <div class="welcome-text">
+        <h1>Welcome, <span>{{ user.First_name }}</span>!</h1>
+        <p>Here's what's happening with your finances today.</p>
+      </div>
+      <div class="wallet-pill">
+        <i class="fas fa-coins"></i>
+        <span>Rs. {{ user.Wallet }}</span>
+      </div>
+    </header>
+
+    <div class="analytics-grid">
+      <div class="stat-card">
+        <div class="icon-box" style="color: #00ffaa;"><i class="fas fa-arrow-trend-up"></i></div>
+        <div class="stat-info">
+          <h3>Total Lent</h3>
+          <p>Rs. {{ total_lent }}</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="icon-box" style="color: #ff4d4d;"><i class="fas fa-arrow-trend-down"></i></div>
+        <div class="stat-info">
+          <h3>Total Owed</h3>
+          <p>Rs. {{ total_owed }}</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="icon-box" style="color: #00d4ff;"><i class="fas fa-users"></i></div>
+        <div class="stat-info">
+          <h3>Active Groups</h3>
+          <p>{{ group_count }}</p>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">Quick Actions</h2>
+    <div class="action-grid">
+      <a href="/groups" class="action-card">
+        <i class="fas fa-search"></i>
+        <span>View Groups</span>
+      </a>
+      <a href="/create-group" class="action-card">
+        <i class="fas fa-plus-circle"></i>
+        <span>Create Group</span>
+      </a>
+      <a href="/join-group" class="action-card">
+        <i class="fas fa-user-plus"></i>
+        <span>Join Group</span>
+      </a>
+    </div>
+    
+  </div> <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('collapsed');
+    }
+  </script>
+</body>
+</html>

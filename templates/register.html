@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Splitwise Register</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="container">
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div style="margin: 20px auto; padding: 10px; background: #1f1f1f; border-radius: 8px; color: #00ffc3; box-shadow: 0 0 10px #00ffc3a6; text-align:center;">
+          {% for category, message in messages %}
+            <p><strong>{{ message }}</strong></p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <h2>Create an Account</h2>
+
+   <form action="/register" method="POST">
+      <input type="text" name="first_name" placeholder="First Name" minlength="2" required>
+      <input type="text" name="last_name" placeholder="Last Name" minlength="2" required>
+      
+      <input type="email" name="email" placeholder="Email" 
+             pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$" 
+             title="Please enter a valid email address (e.g., name@example.com)" 
+             required>
+      
+      <div style="position: relative; width: 100%;">
+        <input type="password" name="password" id="passwordInput" placeholder="Password" 
+               pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" 
+               title="Must contain at least one number, one uppercase and lowercase letter, and be at least 8 characters long" 
+               required style="width: 100%; box-sizing: border-box; padding-right: 40px;">
+               
+        <span id="togglePassword" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; user-select: none;">
+          👁️
+        </span>
+      </div>
+      
+      <button type="submit" class="glow-button" style="margin-top: 15px;">Register</button>
+    </form>
+
+    <p class="switch">Already have an account? <a href="/login" class="glow-button">Login here</a></p>
+  </div>
+
+  <script src="/static/script.js"></script>
+  <script>
+    const togglePassword = document.querySelector('#togglePassword');
+    const passwordInput = document.querySelector('#passwordInput');
+
+    togglePassword.addEventListener('click', function () {
+      // Toggle the type attribute
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      
+      // Toggle the eye icon to a closed eye when visible
+      this.textContent = type === 'password' ? '👁️' : '🙈';
+    });
+  </script>
+</body>
+</html>

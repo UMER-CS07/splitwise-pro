@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>All User Feedback</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    .review-card {
+      background: #1f1f1f;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      box-shadow: 0 0 10px #00ffc3a6;
+      border-left: 5px solid #00ffc3;
+    }
+  </style>
+</head>
+<body class="dark">
+  <div class="container" style="max-width: 800px; margin: auto; padding: 20px;">
+    <h1 style="color: #00ffc3; text-align: center;">Public Reviews</h1>
+    
+    {% if all_reviews %}
+      {% for review in all_reviews %}
+        <div class="review-card">
+          <p><strong>{{ review.First_name }} {{ review.Last_name }}</strong></p>
+          <p><strong>Rating:</strong> {{ review.Rating }} / 5 ⭐</p>
+          <p><strong>Feedback:</strong> <br>{{ review.Description }}</p>
+          <p style="font-size: 0.8em; color: gray;"><strong>Date:</strong> {{ review.Created_At.strftime('%Y-%m-%d') }}</p>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p style="text-align: center;">No feedback has been submitted yet.</p>
+    {% endif %}
+    
+    <div style="text-align: center; margin-top: 30px;">
+      <a class="glow-button" href="/dashboard" style="text-decoration: none; padding: 10px 20px;">⬅ Back to Dashboard</a>
+    </div>
+  </div>
+</body>
+</html>

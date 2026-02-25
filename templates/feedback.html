@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Community Feedback</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    body.dark {
+      background-color: #121212;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .feedback-container {
+      padding: 30px;
+      background: #1f1f1f;
+      border-radius: 12px;
+      box-shadow: 0 0 15px #00ffc3a6;
+      margin-bottom: 30px;
+    }
+
+    h2, h3 {
+      color: #00ffc3;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    label, textarea, select {
+      display: block;
+      width: 100%;
+      margin-bottom: 15px;
+    }
+
+    textarea {
+      height: 100px;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      background: #333;
+      color: white;
+      box-sizing: border-box;
+    }
+
+    select {
+      background: #333;
+      color: white;
+      border-radius: 8px;
+      padding: 10px;
+      border: none;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #00ffc3;
+      color: black;
+      border: none;
+      padding: 12px 15px;
+      border-radius: 10px;
+      font-weight: bold;
+      width: 100%;
+      cursor: pointer;
+      box-shadow: 0 0 10px #00ffc3;
+      margin-bottom: 10px;
+    }
+
+    button:hover {
+      background-color: #00e6b2;
+      box-shadow: 0 0 15px #00ffc3, 0 0 25px #00ffc3;
+    }
+
+    .back-button {
+      display: block;
+      background-color: #555;
+      color: white;
+      padding: 12px 15px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: bold;
+      text-align: center;
+      transition: 0.3s;
+    }
+
+    .back-button:hover {
+      background-color: #777;
+    }
+
+    .submitted-feedback {
+      background: #2a2a2a;
+      padding: 20px;
+      border-radius: 10px;
+      border-left: 5px solid #00ffc3;
+      margin-bottom: 20px;
+    }
+
+    .review-card {
+      background: #2a2a2a;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      border-left: 5px solid #00ffc3;
+    }
+  </style>
+</head>
+<body class="dark">
+  <div class="container">
+    
+    <div class="feedback-container">
+      {% if user_feedback %}
+        <h2>✅ Thanks for your feedback!</h2>
+        <div class="submitted-feedback">
+          <p><strong>Your Rating:</strong> {{ user_feedback.Rating }} / 5 ⭐</p>
+          <p><strong>What you said:</strong><br>{{ user_feedback.Description }}</p>
+          <p style="font-size: 0.8em; color: gray; margin-top: 10px;">Date: {{ user_feedback.Created_At.strftime('%Y-%m-%d') }}</p>
+        </div>
+        <a href="/dashboard" class="back-button">⬅ Back to Dashboard</a>
+      {% else %}
+        <h2>💬 Give Us Your Feedback</h2>
+        <form method="POST" action="/feedback">
+          <label for="description">Feedback:</label>
+          <textarea name="description" required placeholder="Write your thoughts here..."></textarea>
+
+          <label for="rating">Rating:</label>
+          <select name="rating" required>
+            <option value="">Select a rating</option>
+            <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+            <option value="4">⭐⭐⭐⭐ Good</option>
+            <option value="3">⭐⭐⭐ Average</option>
+            <option value="2">⭐⭐ Poor</option>
+            <option value="1">⭐ Very Poor</option>
+          </select>
+
+          <button type="submit">Submit Feedback</button>
+          <a href="/dashboard" class="back-button">Cancel & Return</a>
+        </form>
+      {% endif %}
+    </div>
+
+    <div class="feedback-container">
+      <h3>🌍 Community Reviews</h3>
+      
+      {% if all_reviews %}
+        {% for review in all_reviews %}
+          <div class="review-card">
+            <p style="color: #00ffc3; margin-top: 0;"><strong>{{ review.First_name }} {{ review.Last_name }}</strong></p>
+            <p><strong>Rating:</strong> {{ review.Rating }} / 5 ⭐</p>
+            <p>{{ review.Description }}</p>
+            <p style="font-size: 0.8em; color: gray; margin-bottom: 0;">{{ review.Created_At.strftime('%Y-%m-%d') }}</p>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p style="text-align: center; color: gray;">No reviews yet. Be the first to share your thoughts!</p>
+      {% endif %}
+      
+    </div>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Group Summary</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    body {
+      background-color: #121212;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 50px auto;
+      padding: 40px;
+      background-color: #1e1e1e;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0, 255, 195, 0.15);
+    }
+
+    /* Header Styling */
+    h1 {
+      color: #fff;
+      border-bottom: 2px solid #333;
+      padding-bottom: 15px;
+      margin-bottom: 30px;
+      font-size: 2.2rem;
+      text-align: center;
+    }
+    h1 span {
+      color: #00ffc3;
+    }
+
+    .section {
+      margin-bottom: 40px;
+      background-color: #242424;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      border-left: 4px solid #00ffc3;
+    }
+
+    .section h2 {
+      color: #00ffc3;
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Members Pills */
+    .members-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .member-pill {
+      background-color: #1a1a1a;
+      border: 1px solid #333;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.95rem;
+      color: #ddd;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .member-pill i { color: #00ffc3; }
+
+    /* Modern Tables */
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 8px;
+      border: 1px solid #333;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #1a1a1a;
+      text-align: left;
+    }
+
+    th {
+      background-color: rgba(0, 255, 195, 0.1);
+      color: #00ffc3;
+      padding: 15px;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    td {
+      padding: 15px;
+      border-bottom: 1px solid #2a2a2a;
+      color: #ccc;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background-color: #222;
+      color: #fff;
+    }
+
+    /* Buttons */
+    .button-group {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #333;
+    }
+
+    .glow-button {
+      background-color: #00ffc3;
+      color: #121212;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 1rem;
+      box-shadow: 0 0 10px rgba(0, 255, 195, 0.4);
+      transition: all 0.3s;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .glow-button:hover {
+      background-color: #00e6b2;
+      box-shadow: 0 0 15px #00ffc3, 0 0 25px #00ffc3;
+    }
+    /* Custom Modal Styling */
+    .modal-overlay {
+      display: none; /* Hidden by default */
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background-color: #1e1e1e;
+      border: 2px solid #ff4d4d;
+      border-radius: 12px;
+      padding: 30px;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 0 25px rgba(255, 77, 77, 0.25);
+      animation: popIn 0.3s ease-out;
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-content h2 {
+      color: #fff;
+      margin: 10px 0;
+      border-bottom: none;
+    }
+
+    .modal-content p {
+      color: #ccc;
+      line-height: 1.5;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 25px;
+    }
+
+    .outline-button {
+      background-color: transparent;
+      color: #00ffc3;
+      border: 1px solid #00ffc3;
+      padding: 12px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 1rem;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .outline-button:hover {
+      background-color: #00ffc3;
+      color: #121212;
+      box-shadow: 0 0 15px rgba(0, 255, 195, 0.4);
+    }
+
+    /* Delete Settlement Button */
+    .delete-btn {
+      background: transparent;
+      color: #ff4d4d;
+      border: 1px solid #ff4d4d;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .delete-btn:hover {
+      background: #ff4d4d;
+      color: #fff;
+      box-shadow: 0 0 10px rgba(255, 77, 77, 0.4);
+    }
+
+    .empty-state {
+      color: #777;
+      font-style: italic;
+      padding: 10px 0;
+    }
+  </style>
+</head>
+
+<body>
+  
+  <div class="container">
+    
+    <h1>Group Summary: <span>{{ group.Group_name }}</span></h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div style="margin-bottom: 20px;">
+          {% for category, message in messages %}
+            
+            {% if category == 'success' %}
+              <div style="padding: 12px 20px; border-radius: 8px; margin-bottom: 10px; font-weight: 500; background-color: rgba(0, 255, 195, 0.15); border-left: 4px solid #00ffc3; color: #00ffc3;">
+                {{ message }}
+              </div>
+            {% else %}
+              <div style="padding: 12px 20px; border-radius: 8px; margin-bottom: 10px; font-weight: 500; background-color: rgba(255, 77, 77, 0.15); border-left: 4px solid #ff4d4d; color: #ff4d4d;">
+                {{ message }}
+              </div>
+            {% endif %}
+
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    
+    <div class="section">
+      
+      <h2><i class="fas fa-users"></i> Members</h2>
+      <ul class="members-list">
+        {% for member in members %}
+          <li class="member-pill">
+            <i class="fas fa-user-circle"></i> {{ member.First_name }} {{ member.Last_name }} <span style="color: #777;">(ID: {{ member.ID }})</span>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2><i class="fas fa-file-invoice-dollar"></i> Expenses</h2>
+      {% if expenses %}
+        <div class="table-wrapper">
+          <table>
+            <tr>
+              <th>ID</th>
+              <th>Description</th>
+              <th>Amount</th>
+              <th>Paid By</th>
+            </tr>
+            {% for expense in expenses %}
+            <tr>
+              <td>#{{ expense.ID }}</td>
+              <td style="color: #fff; font-weight: 500;">{{ expense.Description }}</td>
+              <td style="color: #00ffc3; font-weight: bold;">${{ expense.Amount }}</td>
+              <td> {{ expense.Paid_by }}</td>
+            </tr>
+            {% endfor %}
+          </table>
+        </div>
+      {% else %}
+        <p class="empty-state">No expenses recorded yet.</p>
+      {% endif %}
+    </div>
+
+    <div class="section">
+      <h2><i class="fas fa-handshake"></i> Settlements</h2>
+      {% if settlements %}
+        <div class="table-wrapper">
+          <table>
+            <tr>
+              <th>ID</th>
+              <th>From</th>
+              <th>To</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+            {% for s in settlements %}
+            <tr>
+              <td>#{{ s.ID }}</td>
+              <td>{{ s.From_Name }} <span style="font-size: 0.8em; color:#777;">(ID: {{ s.From_UserID }})</span></td>
+              <td>{{ s.To_Name }} <span style="font-size: 0.8em; color:#777;">(ID: {{ s.To_UserID }})</span></td>
+              <td style="color: #00ffc3; font-weight: bold;">${{ s.Amount }}</td>
+              <td>
+                <span style="background: #333; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem;">{{ s.Status }}</span>
+              </td>
+             <td>
+                {% if s.From_UserID == session['user_id'] %}
+                  {% if s.Status == 'pending' %}
+                    <form method="POST" action="/settle-wallet/single/{{ s.ID }}" style="display:inline;">
+                      <button type="submit" class="glow-button" style="padding: 6px 12px; font-size: 0.85rem; margin-right: 5px;">
+                        <i class="fas fa-wallet"></i> Pay
+                      </button>
+                    </form>
+                  {% else %}
+                    <span style="color: #4caf50; font-size: 0.85rem;"><i class="fas fa-check-circle"></i> Paid</span>
+                  {% endif %}
+                {% endif %}
+
+               {% if group.Created_by|int == session['user_id']|int %}
+                  <form method="POST" action="/settlement/delete/{{ s.ID }}" style="display:inline;">
+                    
+                    <button type="button" class="delete-btn" onclick="openModal(this)">
+                      <i class="fas fa-trash-alt"></i> Delete
+                    </button>
+
+                  </form>
+                {% endif %}
+
+                {% if s.From_UserID != session['user_id'] and group.Created_by|int != session['user_id']|int %}
+                  <span style="color: #555; font-size: 0.85rem;"><i class="fas fa-lock"></i> Not yours</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </table>
+        </div>
+      {% else %}
+        <p class="empty-state">No settlements generated yet.</p>
+      {% endif %}
+    </div>
+
+    <div class="button-group">
+      {% if group.Created_by|int == session['user_id']|int %}
+        <a href="/add-expense/{{ group.ID }}" class="glow-button">
+          <i class="fas fa-plus-circle"></i> Add Expense
+        </a>
+      {% endif %}
+
+
+
+      <a href="/groups" class="outline-button">
+        <i class="fas fa-arrow-left"></i> Back to Groups
+      </a>
+    </div>
+  </div>
+  <div id="customDeleteModal" class="modal-overlay">
+    <div class="modal-content">
+      <i class="fas fa-exclamation-triangle" style="color: #ff4d4d; font-size: 3rem;"></i>
+      <h2>Confirm Deletion</h2>
+      <p>As Admin, you are about to permanently delete this settlement. The user will no longer owe this amount.</p>
+      <p style="color: #ff4d4d; font-weight: bold;">Are you sure you want to proceed?</p>
+      
+      <div class="modal-buttons">
+        <button class="outline-button" style="color: #ccc; border-color: #555;" onclick="closeModal()">Cancel</button>
+        <button class="glow-button" style="background-color: #ff4d4d; color: #fff; box-shadow: 0 0 10px rgba(255, 77, 77, 0.4);" onclick="confirmDelete()">Yes, Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let formToSubmit = null; // This will remember WHICH settlement we are deleting
+
+    // Function to open the modal
+    function openModal(buttonElement) {
+      // Find the specific form that the button belongs to
+      formToSubmit = buttonElement.closest('form');
+      // Show the modal
+      document.getElementById('customDeleteModal').style.display = 'flex';
+    }
+
+    // Function to close the modal
+    function closeModal() {
+      document.getElementById('customDeleteModal').style.display = 'none';
+      formToSubmit = null; // Reset the form
+    }
+
+    // Function to actually submit the form when they click "Yes, Delete"
+    function confirmDelete() {
+      if (formToSubmit) {
+        formToSubmit.submit();
+      }
+    }
+  </script>
+</body>
+</html>

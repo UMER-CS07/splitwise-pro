@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Receipt</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #121212;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .message-box {
+            background-color: #1e1e1e;
+            border: 2px solid #4caf50;
+            border-radius: 12px;
+            padding: 40px 60px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 255, 128, 0.2);
+            width: 350px;
+        }
+        .message-box h1 {
+            font-size: 28px;
+            margin: 0;
+            color: #4caf50;
+        }
+        .receipt-details {
+            margin-top: 20px;
+            color: #aaaaaa;
+            font-size: 16px;
+        }
+        .amount {
+            font-size: 48px;
+            font-weight: bold;
+            color: white;
+            margin: 15px 0;
+        }
+        .divider {
+            border-top: 1px dashed #555;
+            margin: 20px 0;
+        }
+        .home-link {
+            display: inline-block;
+            margin-top: 10px;
+            color: #4caf50;
+            text-decoration: none;
+            font-size: 16px;
+            border: 1px solid #4caf50;
+            padding: 10px 25px;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+        .home-link:hover {
+            background-color: #4caf50;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div class="message-box">
+        <h1>Payment Successful! 💸</h1>
+        
+        <div class="receipt-details">
+            <p>You have settled all your debts for</p>
+            <p style="color: white; font-weight: bold;">{{ group_name }}</p>
+        </div>
+
+        <div class="amount">
+            ${{ amount }}
+        </div>
+
+        <div class="receipt-details">
+            <p>Paid from your Wallet</p>
+        </div>
+
+        <div class="divider"></div>
+
+        <a href="/group/{{ group_id }}/summary" class="home-link">← Back to Group</a>
+    </div>
+</body>
+</html>

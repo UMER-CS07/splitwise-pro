@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Your Groups</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    body.dark {
+      background-color: #121212;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 60px auto;
+      padding: 30px;
+      background-color: #1e1e1e;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0, 255, 195, 0.15);
+    }
+
+    h1 {
+      text-align: center;
+      color: #00ffc3;
+      margin-bottom: 30px;
+      font-size: 2.2rem;
+      letter-spacing: 1px;
+    }
+
+    /* Flash Messages */
+    .flash-container { margin-bottom: 20px; }
+    .flash-message { 
+      background: rgba(0, 255, 195, 0.1); 
+      border-left: 4px solid #00ffc3; 
+      padding: 10px 15px; 
+      border-radius: 4px; 
+      margin-bottom: 10px; 
+    }
+
+    /* Professional Group Card Layout */
+    .group-card {
+      background-color: #242424;
+      margin: 20px 0;
+      border-radius: 12px;
+      border-left: 5px solid #00ffc3;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      overflow: hidden; /* Keeps the accordion neat */
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .group-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 15px rgba(0, 255, 195, 0.2);
+    }
+
+    /* Top visible section */
+    .group-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 25px;
+    }
+
+    .group-title h2 {
+      margin: 0;
+      color: #fff;
+      font-size: 1.5rem;
+    }
+
+    .group-title p {
+      margin: 5px 0 0 0;
+      font-size: 0.85rem;
+      color: #888;
+    }
+
+    /* Primary Dashboard Button */
+    .dashboard-btn {
+      background-color: #00ffc3;
+      color: #121212;
+      padding: 12px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 0.95rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 0 10px rgba(0, 255, 195, 0.4);
+      transition: all 0.3s;
+    }
+
+    .dashboard-btn:hover {
+      background-color: #00e6b2;
+      box-shadow: 0 0 15px #00ffc3, 0 0 25px #00ffc3;
+    }
+
+    /* Expandable Settings/Info Block */
+    details.group-settings {
+      background-color: #1a1a1a;
+      border-top: 1px solid #333;
+    }
+
+    details.group-settings summary {
+      padding: 12px 25px;
+      color: #00ffc3;
+      font-size: 0.9rem;
+      cursor: pointer;
+      list-style: none; /* Hides default arrow */
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    details.group-settings summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.group-settings summary:hover {
+      background-color: #222;
+    }
+
+    /* Content inside the expanded accordion */
+    .settings-content {
+      padding: 15px 25px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #2a2a2a;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      color: #bbb;
+      font-size: 0.9rem;
+    }
+    /* Custom Modal Styling */
+    .modal-overlay {
+      display: none; /* Hidden by default */
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background-color: #1e1e1e;
+      border: 2px solid #ff4d4d;
+      border-radius: 12px;
+      padding: 30px;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 0 25px rgba(255, 77, 77, 0.25);
+      animation: popIn 0.3s ease-out;
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-content h2 {
+      color: #fff;
+      margin: 10px 0;
+      border-bottom: none;
+    }
+
+    .modal-content p {
+      color: #ccc;
+      line-height: 1.5;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 25px;
+    }
+
+    .info-grid span { color: #fff; font-weight: bold; }
+
+    /* Delete Button Styling */
+    .delete-btn {
+      background: transparent;
+      color: #ff4d4d;
+      border: 1px solid #ff4d4d;
+      padding: 8px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: 0.3s;
+    }
+
+    .delete-btn:hover {
+      background: #ff4d4d;
+      color: #fff;
+      box-shadow: 0 0 10px rgba(255, 77, 77, 0.5);
+    }
+
+    /* Global Navigation */
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 40px;
+    }
+    
+    .glow-button {
+      background-color: transparent;
+      color: #00ffc3;
+      border: 1px solid #00ffc3;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+
+    .glow-button:hover {
+      background-color: #00ffc3;
+      color: #121212;
+      box-shadow: 0 0 15px rgba(0, 255, 195, 0.6);
+    }
+  </style>
+</head>
+<body class="dark">
+  <div class="container">
+    
+    <h1><i class="fas fa-users"></i> Your Groups</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-container">
+          {% for category, message in messages %}
+            <div class="flash-message">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% if group_list %}
+      {% for group in group_list %}
+        <div class="group-card">
+          
+          <div class="group-header">
+            <div class="group-title">
+              <h2>{{ group.Group_name }}</h2>
+              <p><i class="far fa-calendar-alt"></i> Created on {{ group.Created_at }}</p>
+            </div>
+            <div class="group-actions">
+              <a href="/group/{{ group.ID }}/summary" class="dashboard-btn">
+                Dashboard <i class="fas fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+
+          <details class="group-settings">
+            <summary><i class="fas fa-cog"></i> Group Settings & Info</summary>
+            <div class="settings-content">
+              
+              <div class="info-grid">
+                <div>Share ID: <span>{{ group.ID }}</span></div>
+                <div>Creator ID: <span>{{ group.Created_by }}</span></div>
+              </div>
+
+              <form method="POST" action="/delete-group/{{ group.ID }}" style="display:inline;">
+  
+  <button type="button" class="delete-btn" onclick="openGroupModal(this)">
+    <i class="fas fa-trash-alt"></i> Delete Group
+  </button>
+
+</form>
+
+            </div>
+          </details>
+
+        </div>
+      {% endfor %}
+    {% else %}
+      <div style="text-align: center; padding: 40px; color: #777;">
+        <i class="fas fa-folder-open" style="font-size: 3rem; margin-bottom: 15px; color: #444;"></i>
+        <p style="font-size: 1.2rem;">You haven't joined any groups yet.</p>
+      </div>
+    {% endif %}
+
+    <div class="back-link">
+      <a href="/dashboard" class="glow-button"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+    </div>
+  </div>
+  <div id="customDeleteGroupModal" class="modal-overlay">
+    <div class="modal-content">
+      <i class="fas fa-exclamation-triangle" style="color: #ff4d4d; font-size: 3rem;"></i>
+      <h2>Delete Entire Group?</h2>
+      <p>You are about to permanently delete this group. <strong>All expenses, members, and pending settlements will be erased.</strong></p>
+      <p style="color: #ff4d4d; font-weight: bold;">This action cannot be undone. Are you sure?</p>
+      
+      <div class="modal-buttons">
+        <button type="button" class="outline-button" style="color: #ccc; border-color: #555;" onclick="closeGroupModal()">Cancel</button>
+        <button type="button" class="glow-button" style="background-color: #ff4d4d; color: #fff; box-shadow: 0 0 10px rgba(255, 77, 77, 0.4);" onclick="confirmGroupDelete()">Yes, Delete Group</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let groupFormToSubmit = null;
+
+    function openGroupModal(btn) {
+      groupFormToSubmit = btn.closest('form');
+      document.getElementById('customDeleteGroupModal').style.display = 'flex';
+    }
+
+    function closeGroupModal() {
+      document.getElementById('customDeleteGroupModal').style.display = 'none';
+      groupFormToSubmit = null;
+    }
+
+    function confirmGroupDelete() {
+      if (groupFormToSubmit) {
+        groupFormToSubmit.submit();
+      } else {
+        alert("Error: Could not find the group form to submit.");
+      }
+    }
+  </script>
+</body>
+</html>
