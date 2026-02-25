@@ -7,6 +7,7 @@ from Models.settlement import add_settlement, update_settlement_status
 from Models.connection import get_connection
 from Models.group import get_group_summary
 from flask import flash
+import os
 import re  # We need this to check password patterns
 from flask import flash, redirect, url_for
 app = Flask(__name__)
@@ -159,7 +160,7 @@ def settle_single_wallet(settlement_id):
         cursor.execute("""
             SELECT s.ID, s.To_UserID, s.Amount, s.Group_ID, g.Group_name 
             FROM settlements s
-            JOIN Groups g ON s.Group_ID = g.ID
+            JOIN user_groups g ON s.Group_ID = g.ID
             WHERE s.ID = %s AND s.From_UserID = %s AND s.Status = 'pending'
         """, (settlement_id, user_id))
         settlement = cursor.fetchone()
@@ -211,7 +212,7 @@ def group_summary(group_id):
     cursor = conn.cursor(dictionary=True)
 
     # Get group info
-    cursor.execute("SELECT * FROM groups WHERE ID = %s", (group_id,))
+    cursor.execute("SELECT * FROM user_groups WHERE ID = %s", (group_id,))
     group = cursor.fetchone()
 
     # Get members
@@ -270,7 +271,7 @@ def handle_add_expense(group_id):
 
     try:
         # Fetch group info and creator
-        cursor.execute("SELECT Group_name, Created_by FROM Groups WHERE ID = %s", (group_id,))
+        cursor.execute("SELECT Group_name, Created_by FROM user_groups WHERE ID = %s", (group_id,))
         group = cursor.fetchone()
 
         if not group:
@@ -349,7 +350,7 @@ def groups():
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute("""
-        SELECT distinct  g.* FROM Groups g
+        SELECT distinct  g.* FROM user_groups g
         JOIN Members m ON g.ID = m.Group_ID
         WHERE m.User_ID = %s
     """, (session['user_id'],))
@@ -407,7 +408,7 @@ def join_group():
             cursor = conn.cursor(dictionary=True) # ✅ Using dictionary to easily check the Passcode column
 
             # 1. Check if group exists AND get its real passcode
-            cursor.execute("SELECT ID, Passcode FROM Groups WHERE ID = %s", (group_id,))
+            cursor.execute("SELECT ID, Passcode FROM user_groups WHERE ID = %s", (group_id,))
             group = cursor.fetchone()
 
             if not group:
@@ -504,7 +505,7 @@ def settle():
         cursor = conn.cursor(dictionary=True)
 
         # ✅ Check if requester is the group creator
-        cursor.execute("SELECT Created_by FROM Groups WHERE ID = %s", (group_id,))
+        cursor.execute("SELECT Created_by FROM user_groups WHERE ID = %s", (group_id,))
         group = cursor.fetchone()
 
         if not group:
@@ -561,7 +562,7 @@ def delete_settlement(settlement_id):
         cursor.execute("""
             SELECT s.ID, s.Group_ID, g.Created_by 
             FROM settlements s
-            JOIN Groups g ON s.Group_ID = g.ID
+            JOIN user_groups g ON s.Group_ID = g.ID
             WHERE s.ID = %s
         """, (settlement_id,))
         settlement = cursor.fetchone()
@@ -608,7 +609,7 @@ def delete_group(group_id):
 
     try:
         # Step 1: Check if group exists and if the logged-in user is the Admin
-        cursor.execute("SELECT Created_by FROM Groups WHERE ID = %s", (group_id,))
+        cursor.execute("SELECT Created_by FROM user_groups WHERE ID = %s", (group_id,))
         group = cursor.fetchone()
 
         if not group:
@@ -618,7 +619,7 @@ def delete_group(group_id):
         if int(group['Created_by']) != int(user_id):
             flash("❌ Unauthorized: Only the Group Admin can delete this group.", "error")
             return redirect('/groups')
-# Step 2: Delete "grandchildren" first (expense_share depends on expenses)
+# Step 2: Delete "grandchildren" (shares depend on expenses)
         cursor.execute("""
             DELETE FROM expense_share 
             WHERE Expense_ID IN (SELECT ID FROM expenses WHERE Group_ID = %s)
@@ -628,12 +629,11 @@ def delete_group(group_id):
         cursor.execute("DELETE FROM settlements WHERE Group_ID = %s", (group_id,))
         cursor.execute("DELETE FROM expenses WHERE Group_ID = %s", (group_id,))
         
-        # 👇 REMOVED the group_members line since your table is named differently!
-        # cursor.execute("DELETE FROM group_members WHERE Group_ID = %s", (group_id,))
+        # ✅ ADD THIS LINE: Delete the membership links
+        cursor.execute("DELETE FROM Members WHERE Group_ID = %s", (group_id,))
 
-        # Step 4: Now it is safe to delete the parent (the Group itself)
-        cursor.execute("DELETE FROM Groups WHERE ID = %s", (group_id,))
-        
+        # Step 4: Now delete the parent (the Group itself)
+        cursor.execute("DELETE FROM user_groups WHERE ID = %s", (group_id,))
         # Save all the deletions!
         conn.commit()
         

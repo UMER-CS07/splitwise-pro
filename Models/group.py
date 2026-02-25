@@ -6,7 +6,7 @@ def create_group(group_name, created_by, passcode):
     cursor = conn.cursor()
 
     # ✅ Insert the group WITH the Passcode
-    sql = "INSERT INTO Groups (Group_name, Created_by, Passcode, Created_at) VALUES (%s, %s, %s, NOW())"
+    sql = "INSERT INTO user_groups (Group_name, Created_by, Passcode, Created_at) VALUES (%s, %s, %s, NOW())"
     cursor.execute(sql, (group_name, created_by, passcode))
     group_id = cursor.lastrowid
 
@@ -34,7 +34,7 @@ def get_group_info(group_id):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
 
-    cursor.execute("SELECT * FROM Groups WHERE ID = %s", (group_id,))
+    cursor.execute("SELECT * FROM user_groups WHERE ID = %s", (group_id,))
     group = cursor.fetchone()
     if not group:
         raise Exception("Group not found")
@@ -56,7 +56,7 @@ def get_groups_by_user(user_id):
     cursor = conn.cursor(dictionary=True)
     sql = """
         SELECT ID, Group_name, Created_at
-        FROM Groups
+        FROM user_groups
         WHERE Created_by = %s
     """
     cursor.execute(sql, (user_id,))
@@ -64,39 +64,38 @@ def get_groups_by_user(user_id):
     conn.close()
     return groups
 
-
 def get_group_summary(group_id):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # Group info
-    cursor.execute("SELECT * FROM groups WHERE ID = %s", (group_id,))
+    # 1. Group info
+    cursor.execute("SELECT * FROM user_groups WHERE ID = %s", (group_id,))
     group = cursor.fetchone()
 
-    # Members
+    # 2. Members (Fixed table names to 'Members' and 'Userr')
     cursor.execute("""
         SELECT u.ID, u.First_name, u.Last_name
-        FROM group_members gm
-        JOIN users u ON gm.User_ID = u.ID
-        WHERE gm.Group_ID = %s
+        FROM Members m
+        JOIN Userr u ON m.User_ID = u.ID
+        WHERE m.Group_ID = %s
     """, (group_id,))
     members = cursor.fetchall()
 
-    # Expenses
+    # 3. Expenses
     cursor.execute("""
-        SELECT * FROM expenses
-        WHERE Group_ID = %s
+        SELECT * FROM expenses 
+        WHERE Group_ID = %s 
         ORDER BY Created_at DESC
     """, (group_id,))
     expenses = cursor.fetchall()
 
-    # Settlements
+    # 4. Settlements (Fixed to use 'Members')
     cursor.execute("""
-        SELECT * FROM settlements
+        SELECT * FROM settlements 
         WHERE From_UserID IN (
-            SELECT User_ID FROM group_members WHERE Group_ID = %s
+            SELECT User_ID FROM Members WHERE Group_ID = %s
         ) AND To_UserID IN (
-            SELECT User_ID FROM group_members WHERE Group_ID = %s
+            SELECT User_ID FROM Members WHERE Group_ID = %s
         )
     """, (group_id, group_id))
     settlements = cursor.fetchall()
@@ -108,4 +107,3 @@ def get_group_summary(group_id):
         "expenses": expenses,
         "settlements": settlements
     }
-
