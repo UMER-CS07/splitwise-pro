@@ -351,7 +351,7 @@ def groups():
     cursor = conn.cursor(dictionary=True)
     cursor.execute("""
         SELECT distinct  g.* FROM user_groups g
-        JOIN Members m ON g.ID = m.Group_ID
+        JOIN members m ON g.ID = m.Group_ID
         WHERE m.User_ID = %s
     """, (session['user_id'],))
     group_list = cursor.fetchall()
@@ -419,12 +419,12 @@ def join_group():
                 raise Exception("Incorrect Group Passcode! Access Denied.")
 
             # 3. Check if user is already a member
-            cursor.execute("SELECT * FROM Members WHERE Group_ID = %s AND User_ID = %s", (group_id, session['user_id']))
+            cursor.execute("SELECT * FROM members WHERE Group_ID = %s AND User_ID = %s", (group_id, session['user_id']))
             if cursor.fetchone():
                 raise Exception("Already a member of this group")
 
             # 4. Add member
-            cursor.execute("INSERT INTO Members (Group_ID, User_ID, Joined_at) VALUES (%s, %s, NOW())", (group_id, session['user_id']))
+            cursor.execute("INSERT INTO members (Group_ID, User_ID, Joined_at) VALUES (%s, %s, NOW())", (group_id, session['user_id']))
             conn.commit()
             conn.close()
 
@@ -448,12 +448,12 @@ def add_member():
         cursor = conn.cursor()
 
         # Check for duplicate
-        cursor.execute("SELECT 1 FROM Members WHERE Group_ID = %s AND User_ID = %s", (group_id, user_id))
+        cursor.execute("SELECT 1 FROM members WHERE Group_ID = %s AND User_ID = %s", (group_id, user_id))
         if cursor.fetchone():
             return jsonify({"status": "error", "message": "User already a member of this group"}), 400
 
         # Add if not exists
-        cursor.execute("INSERT INTO Members (Group_ID, User_ID, Joined_at) VALUES (%s, %s, NOW())", (group_id, user_id))
+        cursor.execute("INSERT INTO members (Group_ID, User_ID, Joined_at) VALUES (%s, %s, NOW())", (group_id, user_id))
         conn.commit()
         conn.close()
 
@@ -630,7 +630,7 @@ def delete_group(group_id):
         cursor.execute("DELETE FROM expenses WHERE Group_ID = %s", (group_id,))
         
         # ✅ ADD THIS LINE: Delete the membership links
-        cursor.execute("DELETE FROM Members WHERE Group_ID = %s", (group_id,))
+        cursor.execute("DELETE FROM members WHERE Group_ID = %s", (group_id,))
 
         # Step 4: Now delete the parent (the Group itself)
         cursor.execute("DELETE FROM user_groups WHERE ID = %s", (group_id,))
